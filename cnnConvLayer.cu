@@ -19,8 +19,8 @@ void convLayerCPU()
 	for(fn = 0; fn < FILTNUM; fn++){
 		for(fmy = 0; fmy < FMSIZE; fmy += STRIDE){
 			for(fmx = 0; fmx < FMSIZE; fmx += STRIDE){
+				sum = 0;
 				for(sli = 0; sli < FMDEPTH; sli++){
-					sum = 0;
 					for(y = 0; y < FILTSIZE; y++){
 						for(x = 0; x < FILTSIZE; x++){
 							ifmy = fmy - FILTSIZE / 2 + y;
@@ -111,3 +111,4 @@ int main()
 	
 	return 0;
 }
+
