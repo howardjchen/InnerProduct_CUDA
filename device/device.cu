@@ -10,8 +10,8 @@ int main() {
     printf("Device Number: %d\n", i);
 
     printf("Device name: %s\n", prop.name);
-		printf("TotalGlobalMem: %d MB\n", prop.totalGlobalMem/1024);
-		printf("SharedMemPerBlock: %d MB\n", prop.sharedMemPerBlock/1024);
+		printf("TotalGlobalMem: %d kB\n", prop.totalGlobalMem/1024);
+		printf("SharedMemPerBlock: %d kB\n", prop.sharedMemPerBlock/1024);
 		printf("MaxThreadsPerBlock: %d\n", prop.maxThreadsPerBlock);
 		printf("MaxThreadsDim [x]: %d [y]: %d [z]: %d\n", 
 					prop.maxThreadsDim[0], prop.maxThreadsDim[1], prop.maxThreadsDim[2]);

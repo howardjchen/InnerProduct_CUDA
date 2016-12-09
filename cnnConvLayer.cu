@@ -27,7 +27,7 @@ void convLayerCPU()
 							ifmx = fmx - FILTSIZE / 2 + x;
 							filtIdx = fn*filtVol + sli*filtArea + y*FILTSIZE + x;
 							inNeuIdx = sli*fmArea + ifmy*FMSIZE + ifmx;
-							if(ifmy > 0 && ifmy < FMSIZE && ifmx > 0 && ifmx < FMSIZE)
+							if(ifmy >= 0 && ifmy < FMSIZE && ifmx >= 0 && ifmx < FMSIZE)
 								sum += filt[filtIdx] * inNeu[inNeuIdx];
 						}
 					}
@@ -111,4 +111,3 @@ int main()
 	
 	return 0;
 }
-
