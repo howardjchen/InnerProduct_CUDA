@@ -99,14 +99,20 @@ int main()
 {
 	init();
 
+
+
+
 	timespec time_begin, time_end;                                                 
-  clock_gettime(CLOCK_REALTIME, &time_begin);
+  	clock_gettime(CLOCK_REALTIME, &time_begin);
 
 	innerProductCPU();
 
-  clock_gettime(CLOCK_REALTIME, &time_end);
+  	clock_gettime(CLOCK_REALTIME, &time_end);
 	cout << "CPU time for executing inner-product = " 
 			 << timespec_diff_us(time_begin, time_end) / 1000 << "ms" << endl;
+
+
+
 
 	/***	Inside area is CUDA related code ***/
 	initGPU();
@@ -114,14 +120,22 @@ int main()
 	dim3 threadsPerBlock(VECLEN);
 	dim3 numBlocks(VECNUM);
 
-  clock_gettime(CLOCK_REALTIME, &time_begin);
+
+
+
+  	clock_gettime(CLOCK_REALTIME, &time_begin);
 	/***	Lunch your CUDA kernel here ***/
 
 	innerProductGPU<<<numBlocks, threadsPerBlock>>>(devInputA, devInputB, devOut);
 
 	cudaDeviceSynchronize();
 	/***	Lunch your CUDA kernel here ***/
-  clock_gettime(CLOCK_REALTIME, &time_end);
+  	clock_gettime(CLOCK_REALTIME, &time_end);
+
+
+  	//cout <<　"numBlocks = " << numBlocks << endl;
+  	//cout <<  "threadsPerBlock = " << threadsPerBlock << endl;
+
 
 	int outSize = sizeof(int)*VECNUM;
 	cudaMemcpy(outGPU, devOut, outSize, cudaMemcpyDeviceToHost);
