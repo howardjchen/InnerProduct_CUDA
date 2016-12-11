@@ -34,12 +34,11 @@ void convLayerCPU()
 					{
 						for(x = 0; x < FILTSIZE; x++)  //3
 						{
-							//printf(" fn = %d  fmy = %d  fmx = %d  sli = %d  y = %d  x = %d  \n", fn, fmy,fmx, sli,y,x );
-							ifmy = fmy - FILTSIZE / 2 + y;
-							ifmx = fmx - FILTSIZE / 2 + x;
-							filtIdx = (fn * filtVol) + (sli * filtArea) + (y * FILTSIZE) + x;
-							inNeuIdx = sli*fmArea + ifmy*FMSIZE + ifmx;
-							if(ifmy >= 0 && ifmy < FMSIZE && ifmx >= 0 && ifmx < FMSIZE)
+							ifmy = fmy - FILTSIZE / 2 + y;		//no dependancy
+							ifmx = fmx - FILTSIZE / 2 + x;		//no dependancy
+							filtIdx = (fn * filtVol) + (sli * filtArea) + (y * FILTSIZE) + x;	//no dependancy
+							inNeuIdx = sli*fmArea + ifmy*FMSIZE + ifmx;							//no dependancy
+							if(ifmy >= 0 && ifmy < FMSIZE && ifmx >= 0 && ifmx < FMSIZE)		
 								sum += filt[filtIdx] * inNeu[inNeuIdx];
 						}
 					}
@@ -58,13 +57,18 @@ void convLayerCPU()
  	cout << "Pooling....." << endl;
 	// Max Pooling with Window Size 2x2
 	int max, tmpVal;
-	for(sli = 0; sli < FILTNUM; sli++){
-		for(fmy = 0; fmy < FMSIZE/2 ; fmy += 1){
-			for(fmx = 0; fmx < FMSIZE/2 ; fmx += 1){
+	for(sli = 0; sli < FILTNUM; sli++)
+	{
+		for(fmy = 0; fmy < FMSIZE/2 ; fmy += 1)
+		{
+			for(fmx = 0; fmx < FMSIZE/2 ; fmx += 1)
+			{
 				outNeuIdx = sli*fmArea + fmy*2*FMSIZE + fmx*2;
 				max = outNeu[outNeuIdx];
-				for(y = 0; y < 2; y++){
-					for(x = 0; x < 2; x++){
+				for(y = 0; y < 2; y++)
+				{
+					for(x = 0; x < 2; x++)
+					{
 						ofmy = fmy*2 + y;
 						ofmx = fmx*2 + x;
 						outNeuIdx = sli*fmArea + ofmy*FMSIZE + ofmx;

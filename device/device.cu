@@ -13,12 +13,10 @@ int main() {
 		printf("TotalGlobalMem: %d mB\n", prop.totalGlobalMem/1024/1024);
 		printf("SharedMemPerBlock: %d kB\n", prop.sharedMemPerBlock/1024);
 		printf("MaxThreadsPerBlock: %d\n", prop.maxThreadsPerBlock);
-		printf("MaxBlocksDim [x]: %d [y]: %d [z]: %d\n", 
-					prop.maxBlocksDim[0], prop.maxBlocksDim[1], prop.maxBlocksDim[2]);
 		printf("MaxThreadsDim [x]: %d [y]: %d [z]: %d\n", 
 					prop.maxThreadsDim[0], prop.maxThreadsDim[1], prop.maxThreadsDim[2]);
 		printf("MaxGridSize [x]: %d [y]: %d [z]: %d\n", 
-					prop.maxThreadsDim[0], prop.maxThreadsDim[1], prop.maxThreadsDim[2]);
+					prop.maxGridSize[0], prop.maxGridSize[1], prop.maxGridSize[2]);
 		printf("MultiProcessorCount: %d\n", prop.multiProcessorCount);
 		printf("MaxThreadsPerMultiProcessor: %d\n", prop.maxThreadsPerMultiProcessor);
   }

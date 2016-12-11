@@ -3,7 +3,7 @@
 #include <cstdlib>
 using namespace std;
 
-#define VECNUM 50000
+#define VECNUM 65535
 #define VECLEN 1000
 
 int *inputA, *inputB;
