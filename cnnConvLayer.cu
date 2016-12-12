@@ -16,7 +16,7 @@ int *devOut;
 int outputsize = xDim * yDim * zDim;
 int *outResult = new int[outputsize]();
 
-int *CPUout = new int[outputsize]();
+int *CPUout = new int[outputsize](); //
 
 // This is the CPU version, please don't modify it
 void convLayerCPU()
