@@ -44,8 +44,8 @@ void initGPU()
 __global__ 
 void innerProductGPU(int *A, int *B, int *out)
 {
-	int y = blockIdx.y;
-	int x = threadIdx.y;
+	int y = blockIdx.x;
+	int x = threadIdx.x;
 	__shared__ int tmp[VECLEN];
 
 	int idx = y * VECLEN + x;
@@ -117,8 +117,8 @@ int main()
 	/***	Inside area is CUDA related code ***/
 	initGPU();
 
-	dim3 threadsPerBlock(VECLEN,VECLEN);
- 	dim3 numBlocks(VECNUM,VECNUM);
+	dim3 threadsPerBlock(VECLEN);
+ 	dim3 numBlocks(VECNUM);
 
 
 

@@ -88,6 +88,15 @@ void convLayerCPU()
 __global__
 void convLayerGPU()
 {
+	int x = threadIdx.x + blockIdx.x * blockDim.x;
+	int y = threadIdx.y + blockIdx.y * blockDim.y;
+	int z = threadIdx.z + blockIdx.z * blockDim.z;
+	int xall = blockDim.x * gridDim.x;
+	int yall = blockDim.y * gridDim.y;
+	int offset = x + y * xall + z * xall * yall;
+
+
+
 }
 /***	Implement your CUDA Kernel here	***/
 
@@ -96,27 +105,37 @@ int main()
 	float convLayerCPUExecTime, convLayerGPUExecTime;
 	init();
 		
+
+
 	timespec time_begin, time_end;                                                 
-  clock_gettime(CLOCK_REALTIME, &time_begin);
-
+  	clock_gettime(CLOCK_REALTIME, &time_begin);
 	convLayerCPU();
-
-  clock_gettime(CLOCK_REALTIME, &time_end);
+  	clock_gettime(CLOCK_REALTIME, &time_end);
 	convLayerCPUExecTime = timespec_diff_us(time_begin, time_end);
 	cout << "CPU time for executing a typical convolutional layer = " <<  convLayerCPUExecTime / 1000000 << "s" << endl;
 
-  clock_gettime(CLOCK_REALTIME, &time_begin);
-	/***	Lunch your CUDA Kernel here	***/
 
-	//convLayerGPU<<<1,1>>>(); // Lunch the kernel
-	
-	cudaDeviceSynchronize(); // Do synchronization before clock_gettime()
-	/***	Lunch your CUDA Kernel here	***/
-  clock_gettime(CLOCK_REALTIME, &time_end);
+
+
+
+ 	clock_gettime(CLOCK_REALTIME, &time_begin);
+
+ 	dim3 threadPerBlock(1);
+ 	dim3 numBlocks(512,32,32);
+
+	convLayerGPU<<<numBlocks,threadPerBlock>>>(); 
+
+
+	cudaDeviceSynchronize(); 
+  	clock_gettime(CLOCK_REALTIME, &time_end);
 	convLayerGPUExecTime = timespec_diff_us(time_begin, time_end);
 	cout << "GPU time for executing a typical convolutional layer = " << convLayerGPUExecTime / 1000000 << "s" << endl;
 
-	if(checker()){
+
+
+
+	if(checker())
+	{
 		cout << "Congratulations! You pass the check." << endl;
 		cout << "Speedup: " << (float)convLayerCPUExecTime / convLayerGPUExecTime << endl;
 	}
