@@ -1,4 +1,4 @@
-<h1> NCTU IEE 2016 Fall </br> Computer Architecture Final Project </h1>
+<h1>UPSTREAM :  NCTU IEE 2016 Fall </br> Computer Architecture Final Project </h1>
 
 Part-I: Use CUDA to accelerate the operations of a typical convolutional layer in often-used. </br>
 (You can find the description slides [here](https://docs.google.com/presentation/d/1uYAh4sU3ZA39zQfRGr596CdbRKgjEh4FnfDEz4eQwuU/edit?usp=sharing))
