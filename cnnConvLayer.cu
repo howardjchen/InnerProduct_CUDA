@@ -4,6 +4,19 @@
 #include <stdio.h>
 using namespace std;
 
+#define xDim 512
+#define yDim 32
+#define zDim 32
+
+#define xThreadDim 16
+#define yThreadDim 16
+#define zThreadDim 4
+
+int *devOut;
+int outputsize = xDim * yDim * zDim;
+int *outResult = new int[outputsize]();
+
+int *CPUout = new int[outputsize]();
 
 // This is the CPU version, please don't modify it
 void convLayerCPU()
@@ -84,9 +97,26 @@ void convLayerCPU()
 	}
 }
 
+
+void initGPU()
+{
+	cudaMalloc(&devOut, sizeof(int)*outputsize);
+}
+
+void CPUrun()
+{
+	int i;
+
+	for (i = 0; i < outputsize; ++i)
+	{
+		CPUout[i] = 1;
+	}
+}
+
+
 /***	Implement your CUDA Kernel here	***/
 __global__
-void convLayerGPU()
+void convLayerGPU(int *out)
 {
 	int x = threadIdx.x + blockIdx.x * blockDim.x;
 	int y = threadIdx.y + blockIdx.y * blockDim.y;
@@ -95,7 +125,7 @@ void convLayerGPU()
 	int yall = blockDim.y * gridDim.y;
 	int offset = x + y * xall + z * xall * yall;
 
-
+	out[offset] = 1;
 
 }
 /***	Implement your CUDA Kernel here	***/
@@ -109,30 +139,56 @@ int main()
 
 	timespec time_begin, time_end;                                                 
   	clock_gettime(CLOCK_REALTIME, &time_begin);
-	convLayerCPU();
+	//convLayerCPU();
+	CPUrun();
   	clock_gettime(CLOCK_REALTIME, &time_end);
 	convLayerCPUExecTime = timespec_diff_us(time_begin, time_end);
-	cout << "CPU time for executing a typical convolutional layer = " <<  convLayerCPUExecTime / 1000000 << "s" << endl;
+	cout << " ================ Result ===================" << endl;
+	cout << "CPU time for executing a typical convolutional layer = " <<  convLayerCPUExecTime / 1000 << "ms" << endl;
 
 
 
 
 
+ 	initGPU();
+ 	dim3 threadPerBlock(xThreadDim, yThreadDim, zThreadDim);
+ 	dim3 numBlocks(xDim/xThreadDim, yDim/yThreadDim, zDim/zThreadDim);
  	clock_gettime(CLOCK_REALTIME, &time_begin);
 
- 	dim3 threadPerBlock(1);
- 	dim3 numBlocks(512,32,32);
 
-	convLayerGPU<<<numBlocks,threadPerBlock>>>(); 
+	convLayerGPU<<<numBlocks,threadPerBlock>>>(devOut); 
 
 
 	cudaDeviceSynchronize(); 
   	clock_gettime(CLOCK_REALTIME, &time_end);
 	convLayerGPUExecTime = timespec_diff_us(time_begin, time_end);
-	cout << "GPU time for executing a typical convolutional layer = " << convLayerGPUExecTime / 1000000 << "s" << endl;
+	cout << "GPU time for executing a typical convolutional layer = " << convLayerGPUExecTime / 1000 << "ms" << endl;
+
+
+	int outSize = sizeof(int)*outputsize;
+	cudaMemcpy(outResult, devOut, outSize, cudaMemcpyDeviceToHost);
+	cudaFree(&devOut);
+
+
+	int sumGPU = 0;
+	int sumCPU = 0;
+	for (int i = 0; i < outputsize; ++i)
+	{
+		sumGPU += outResult[i];
+		sumCPU += CPUout[i];
+	}
+
+	if((sumCPU - sumGPU) == 0)
+		printf("right\n");
+	else
+		printf("wrong\n");
+
+	delete [] outResult;
+	delete [] CPUout;
 
 
 
+/*
 
 	if(checker())
 	{
@@ -141,7 +197,7 @@ int main()
 	}
 	else
 		cout << "Sorry! Your result is wrong." << endl;
-
+*/
 	ending();
 	
 	return 0;
