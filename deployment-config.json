@@ -1,0 +1,9 @@
+{
+    "type": "sftp",
+    "host": "140.113.225.114",
+    "username": "ca14",
+    "password": "5168",
+    "port": 52520,
+    "remotePath": "/home/CA2016F/ca14/3DBlockControl/CNN_CUDA",
+    "uploadOnSave": true
+}

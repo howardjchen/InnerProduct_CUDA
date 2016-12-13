@@ -8,9 +8,9 @@ using namespace std;
 #define yDim 32
 #define zDim 32
 
-#define xThreadDim 16
+#define xThreadDim 4
 #define yThreadDim 16
-#define zThreadDim 4
+#define zThreadDim 16
 
 int *devOut;
 int outputsize = xDim * yDim * zDim;
@@ -51,7 +51,7 @@ void convLayerCPU()
 							ifmx = fmx - FILTSIZE / 2 + x;		//no dependancy
 							filtIdx = (fn * filtVol) + (sli * filtArea) + (y * FILTSIZE) + x;	//no dependancy
 							inNeuIdx = sli*fmArea + ifmy*FMSIZE + ifmx;							//no dependancy
-							if(ifmy >= 0 && ifmy < FMSIZE && ifmx >= 0 && ifmx < FMSIZE)		
+							if(ifmy >= 0 && ifmy < FMSIZE && ifmx >= 0 && ifmx < FMSIZE)
 								sum += filt[filtIdx] * inNeu[inNeuIdx];
 						}
 					}
@@ -85,7 +85,7 @@ void convLayerCPU()
 						ofmy = fmy*2 + y;
 						ofmx = fmx*2 + x;
 						outNeuIdx = sli*fmArea + ofmy*FMSIZE + ofmx;
-						tmpVal = outNeu[outNeuIdx];	
+						tmpVal = outNeu[outNeuIdx];
 						if(tmpVal > max)
 							max = tmpVal;
 					}
@@ -118,14 +118,18 @@ void CPUrun()
 __global__
 void convLayerGPU(int *out)
 {
-	int x = threadIdx.x + blockIdx.x * blockDim.x;
-	int y = threadIdx.y + blockIdx.y * blockDim.y;
-	int z = threadIdx.z + blockIdx.z * blockDim.z;
+	int threadX = threadIdx.x + blockIdx.x * blockDim.x;
+	int threadY = threadIdx.y + blockIdx.y * blockDim.y;
+	int threadZ = threadIdx.z + blockIdx.z * blockDim.z;
 	int xall = blockDim.x * gridDim.x;
 	int yall = blockDim.y * gridDim.y;
-	int offset = x + y * xall + z * xall * yall;
+	int GlobalThreadId = threadX + threadY * xall + threadZ * xall * yall;
+	int GlobalBlockId = blockIdx.x + blockIdx.y * gridDim.x + blockIdx.z * gridDim.y * gridDim.x;
 
-	out[offset] = 1;
+	if (GlobalBlockId == 1)
+		out[GlobalThreadId] = 1;
+	else
+		out[GlobalThreadId] = 0;
 
 }
 /***	Implement your CUDA Kernel here	***/
@@ -134,10 +138,10 @@ int main()
 {
 	float convLayerCPUExecTime, convLayerGPUExecTime;
 	init();
-		
 
 
-	timespec time_begin, time_end;                                                 
+
+	timespec time_begin, time_end;
   	clock_gettime(CLOCK_REALTIME, &time_begin);
 	//convLayerCPU();
 	CPUrun();
@@ -156,10 +160,10 @@ int main()
  	clock_gettime(CLOCK_REALTIME, &time_begin);
 
 
-	convLayerGPU<<<numBlocks,threadPerBlock>>>(devOut); 
+	convLayerGPU<<<numBlocks,threadPerBlock>>>(devOut);
 
 
-	cudaDeviceSynchronize(); 
+	cudaDeviceSynchronize();
   	clock_gettime(CLOCK_REALTIME, &time_end);
 	convLayerGPUExecTime = timespec_diff_us(time_begin, time_end);
 	cout << "GPU time for executing a typical convolutional layer = " << convLayerGPUExecTime / 1000 << "ms" << endl;
@@ -171,17 +175,24 @@ int main()
 
 
 	int sumGPU = 0;
-	int sumCPU = 0;
+	//int sumCPU = 0;
 	for (int i = 0; i < outputsize; ++i)
 	{
-		sumGPU += outResult[i];
-		sumCPU += CPUout[i];
+		if (outResult[i] == 1)
+		{
+			printf("%d  ", i);
+			sumGPU++;
+		}
+		//printf("%d  ",outResult[i] );
+		//sumGPU += outResult[i];
+		//sumCPU += CPUout[i];
 	}
+	printf("sumGPU = %d\n",sumGPU );
 
-	if((sumCPU - sumGPU) == 0)
+	/*if((sumCPU - sumGPU) == 0)
 		printf("right\n");
 	else
-		printf("wrong\n");
+		printf("wrong\n");*/
 
 	delete [] outResult;
 	delete [] CPUout;
@@ -199,6 +210,6 @@ int main()
 		cout << "Sorry! Your result is wrong." << endl;
 */
 	ending();
-	
+
 	return 0;
 }
